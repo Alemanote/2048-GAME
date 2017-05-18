@@ -153,6 +153,7 @@ Game2048.prototype.move = function (direction) {
 
     if (boardChanged) {
       this._generateTile();
+      this._isGameLost();
     }
   }
 };
@@ -161,5 +162,61 @@ Game2048.prototype.move = function (direction) {
 
 Game2048.prototype._updateScore = function (value) {
   this.score += value;
+};
+
+
+
+Game2048.prototype._renderBoard = function () {
+  this.board.forEach(function(row){ console.log(row); });
+  console.log('Score: ' + this.score);
+};
+
+// Aqui se actualiza la variable "won" a true
+
+Game2048.prototype._updateScore = function(value) {
+  this.score += value;
+  
+  if (value === 2048) {
+    this.won = true;
+  }
+};
+
+Game2048.prototype.win = function () {
+  return this.won;
+};
+
+// Determinar si se ha perdido en el juego
+
+Game2048.prototype._isGameLost = function () {
+  if (this._getAvailablePosition())
+    return;
+
+  var that   = this; 
+  var isLost = true;
+
+  this.board.forEach(function (row, rowIndex) {
+    row.forEach(function (cell, cellIndex) {
+      var current = that.board[rowIndex][cellIndex];
+      var top, bottom, left, right;
+
+      if (that.board[rowIndex][cellIndex - 1]) {
+        left  = that.board[rowIndex][cellIndex - 1];
+      }
+      if (that.board[rowIndex][cellIndex + 1]) {
+        right = that.board[rowIndex][cellIndex + 1];
+      }
+      if (that.board[rowIndex - 1]) {
+        top    = that.board[rowIndex - 1][cellIndex];
+      }
+      if (that.board[rowIndex + 1]) {
+        bottom = that.board[rowIndex + 1][cellIndex];
+      }
+
+      if (current === top || current === bottom || current === left || current === right)
+        isLost = false;
+    });
+  });
+
+  this.lost = isLost;
 };
 
